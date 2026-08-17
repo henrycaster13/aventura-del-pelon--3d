@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>La Aventura del Campeón 3D</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#70cfff;font-family:Arial}
+canvas{display:block;width:100vw;height:100vh;touch-action:none}
+#hud{position:fixed;top:12px;left:12px;right:12px;color:#fff;font-weight:bold;font-size:18px;text-shadow:0 2px 4px #000;display:flex;justify-content:space-between}
+#msg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;color:white;font-size:32px;font-weight:bold;text-align:center;text-shadow:0 3px 5px #000}
+.controls{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 18px}
+.group{display:flex;gap:12px}.b{width:70px;height:70px;border-radius:50%;border:2px solid #fff;background:#182338cc;color:#fff;font-size:28px}
+</style></head><body>
+<canvas id="c"></canvas><div id="hud"><span>❤️ 3</span><span>🪙 <b id="score">0</b></span><span>NIVEL 1-1</span></div><div id="msg"></div>
+<div class="controls"><div class="group"><button class="b" id="l">◀</button><button class="b" id="r">▶</button></div><button class="b" id="j">▲</button></div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');let dpr=1;
+function resize(){dpr=Math.min(devicePixelRatio||1,2);c.width=innerWidth*dpr;c.height=innerHeight*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+const keys={l:0,r:0,j:0};function bind(id,k){const b=document.getElementById(id);['touchstart','mousedown'].forEach(e=>b.addEventListener(e,x=>{x.preventDefault();keys[k]=1},{passive:false}));['touchend','touchcancel','mouseup','mouseleave'].forEach(e=>b.addEventListener(e,x=>{x.preventDefault();keys[k]=0},{passive:false}))}bind('l','l');bind('r','r');bind('j','j');
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')keys.l=1;if(e.key==='ArrowRight')keys.r=1;if(e.key===' '||e.key==='ArrowUp')keys.j=1});addEventListener('keyup',e=>{if(e.key==='ArrowLeft')keys.l=0;if(e.key==='ArrowRight')keys.r=0;if(e.key===' '||e.key==='ArrowUp')keys.j=0});
+let p={x:70,y:0,vy:0},cam=0,score=0,won=0;const coins=[150,220,290,370,450,530,610,700,790,870],plats=[{x:0,w:1000,y:420},{x:180,w:110,y:330},{x:350,w:110,y:270},{x:520,w:120,y:340},{x:700,w:120,y:270},{x:850,w:130,y:350}];let got=[];
+function draw(){
+ let w=innerWidth,h=innerHeight;ctx.clearRect(0,0,w,h);
+ let gr=ctx.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#61c9ff');gr.addColorStop(1,'#dff7ff');ctx.fillStyle=gr;ctx.fillRect(0,0,w,h);
+ // distant hills for depth
+ ctx.fillStyle='#73c66a';for(let i=-1;i<8;i++){let x=i*190-(cam*.25%190);ctx.beginPath();ctx.arc(x,430,150,Math.PI,0);ctx.fill()}
+ // ground/platforms
+ for(const q of plats){let x=q.x-cam;ctx.fillStyle='#7b4b2a';ctx.fillRect(x,q.y,q.w,150);ctx.fillStyle='#48a943';ctx.fillRect(x,q.y,q.w,12)}
+ // coins
+ coins.forEach((cx,i)=>{if(got[i])return;let x=cx-cam,y=plats[i%plats.length].y-45;ctx.fillStyle='#ffd52a';ctx.beginPath();ctx.ellipse(x,y,13,18,0,0,7);ctx.fill();ctx.strokeStyle='#b98200';ctx.stroke()});
+ // player
+ let px=p.x-cam,py=p.y;ctx.fillStyle='#c18a68';ctx.beginPath();ctx.arc(px,py-38,17,0,7);ctx.fill();ctx.fillStyle='#e21f3f';ctx.fillRect(px-21,py-20,42,35);ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.fillText('R',px-7,py+4);ctx.fillStyle='#222';ctx.fillRect(px-18,py+15,16,10);ctx.fillRect(px+2,py+15,16,10);
+ // flag
+ let fx=900-cam;ctx.fillStyle='#555';ctx.fillRect(fx,250,6,170);ctx.fillStyle='#e33';ctx.beginPath();ctx.moveTo(fx+6,260);ctx.lineTo(fx+55,280);ctx.lineTo(fx+6,300);ctx.fill();
+ if(won){document.getElementById('msg').style.display='flex';document.getElementById('msg').textContent='🏆 ¡NIVEL COMPLETADO! 🏆'}
+}
+function update(){if(won)return;let ground=420;if(keys.r)p.x+=3;if(keys.l)p.x-=3;if(keys.j&&p.y>=ground-25)p.vy=-12;p.vy+=.6;p.y+=p.vy;if(p.y>ground-25){p.y=ground-25;p.vy=0}
+ cam=Math.max(0,Math.min(500,p.x-180));coins.forEach((cx,i)=>{let cy=plats[i%plats.length].y-45;if(!got[i]&&Math.hypot(p.x-cx,p.y-cy)<30){got[i]=1;score++;document.getElementById('score').textContent=score}});if(p.x>900)won=1}
+function loop(){update();draw();requestAnimationFrame(loop)}loop();
+</script></body></html>
