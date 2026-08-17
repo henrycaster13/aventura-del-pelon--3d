@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Aventuras del Tío Pelón</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="gameWrap">
+    <canvas id="game" width="1280" height="720"></canvas>
+
+    <div id="hud">
+      <div class="brand">AVENTURAS DEL TÍO PELÓN</div>
+      <div class="stats">
+        <span>❤️ <b id="lives">3</b></span>
+        <span>🪙 <b id="coins">0</b></span>
+        <span>⭐ <b id="stars">0</b></span>
+        <span>🌎 <b id="level">1-1</b></span>
+      </div>
+    </div>
+
+    <div id="message" class="hidden"></div>
+
+    <div id="touch">
+      <button data-key="left">◀</button>
+      <button data-key="right">▶</button>
+      <button data-key="jump">▲</button>
+    </div>
+
+    <div id="startScreen" class="screen">
+      <div class="card">
+        <h1>Aventuras del Tío Pelón</h1>
+        <p>Corre, salta, recoge monedas y estrellas y llega a la bandera.</p>
+        <p class="small">PC: A/D o ←/→ para moverte · W, ↑ o Espacio para saltar</p>
+        <button id="startBtn">JUGAR</button>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
